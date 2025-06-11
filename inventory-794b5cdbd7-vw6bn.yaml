@@ -1,0 +1,386 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    autoscaling.cast.ai/vertical-recommendation-hash: d43cb470160e8d84
+    cni.projectcalico.org/containerID: 7b0248e243bcabaded568ebf8ef4e8423a14dd65ece6a4263d7a191869710a6d
+    cni.projectcalico.org/podIP: 10.20.39.127/32
+    cni.projectcalico.org/podIPs: 10.20.39.127/32
+    kubectl.kubernetes.io/restartedAt: "2022-02-09T12:32:44+02:00"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "2112"
+    prometheus.io/scrape: "true"
+  creationTimestamp: "2025-06-10T12:47:21Z"
+  generateName: inventory-794b5cdbd7-
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: inventory
+    helm.sh/chart: inventory-666.420.69-20250610-1429-1260a1eb0f777b6c5b206745ce5a
+    pod-template-hash: 794b5cdbd7
+    team: pricing
+  name: inventory-794b5cdbd7-vw6bn
+  namespace: console
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: inventory-794b5cdbd7
+    uid: 0b5b69a5-8c56-4dfd-b648-f94ef11d778a
+  resourceVersion: "2827145758"
+  uid: da1ad228-ee2b-42f8-bbb2-5a20ab0b11d2
+spec:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - inventory
+        topologyKey: kubernetes.io/hostname
+  containers:
+  - args:
+    - server
+    env:
+    - name: NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: INSTANCE_ID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: CONTAINER_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: ENVIRONMENT
+      value: dev-master
+    - name: SERVER_PORT
+      value: "8080"
+    - name: REST_PORT
+      value: "8090"
+    - name: METRICS_PORT
+      value: "2112"
+    - name: JAEGER_SERVICE_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels['app.kubernetes.io/name']
+    - name: JAEGER_ENDPOINT
+      value: http://tempo.tools.svc.cluster.local:14268/api/traces
+    - name: JAEGER_SAMPLER_TYPE
+      value: const
+    - name: JAEGER_SAMPLER_PARAM
+      value: "1"
+    - name: USERS_SERVICE_URI
+      value: kubernetes:///users:grpc
+    - name: EXTERNAL_PROVISIONER_SERVICE_URI
+      value: kubernetes:///external-provisioner:grpc
+    - name: SNAPSHOTS_SERVICE_URI
+      value: http://cluster-snapshots:8080
+    - name: FEATURES_CLIENT_RANDOM_CONN_CLOSER_ENABLED
+      value: "true"
+    - name: AZURE_ENVIRONMENT_NAME
+      value: AzurePublicCloud
+    - name: AZURE_GOVCLOUD_ENVIRONMENT_NAME
+      value: AzureUSGovernment
+    - name: FEATURES_API
+      value: http://features-relay.console.svc.cluster.local:1031
+    - name: FEATURES_CLIENT_TIMEOUT
+      value: 100ms
+    - name: CLICKHOUSE_CONFIG_DATABASE
+      value: pricing
+    - name: CLICKHOUSE_CONFIG_MIGRATIONS_TABLE_NAME
+      value: pricing_schema_migrations
+    - name: CLICKHOUSE_CONFIG_USERNAME
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: pricing-clickhouse-credentials
+    - name: CLICKHOUSE_CONFIG_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: pricing-clickhouse-credentials
+    - name: COMPARE_TOP_CLUSTERS
+      value: "3"
+    - name: AWS_SYNC_CONCURRENCY
+      value: "2"
+    - name: AWS_GOVCLOUD_SYNC_CONCURRENCY
+      value: "2"
+    - name: AZURE_SYNC_CONCURRENCY
+      value: "3"
+    - name: AZURE_GOVCLOUD_SYNC_CONCURRENCY
+      value: "3"
+    - name: GCP_SYNC_CONCURRENCY
+      value: "2"
+    - name: TEMPORAL_WORKER_NAMESPACE
+      value: inventory
+    - name: TEMPORAL_WORKER_TASK_QUEUE
+      value: inventory-worker
+    - name: TEMPORAL_WORKER_METRICS_PORT
+      value: "2112"
+    - name: CLOUD_ASSETS_E2E_ORGANIZATION_ID
+      valueFrom:
+        secretKeyRef:
+          key: organization-id
+          name: e2e-pricing
+    - name: DB_SKIPMIGRATIONS
+      value: "true"
+    - name: AWS_CROSS_ROLE_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          key: AWS_ACCESS_KEY_ID
+          name: crossrole-aws-creds
+    - name: AWS_CROSS_ROLE_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          key: AWS_SECRET_ACCESS_KEY
+          name: crossrole-aws-creds
+    - name: AZURE_GOVCLOUD_ENABLED
+      value: "true"
+    - name: CLICKHOUSE_CONFIG_ADDRESS
+      value: clickhouse-clickhouse.pricing.svc.cluster.local:9000
+    - name: CLICKHOUSE_CONFIG_KEEPER_SERVER
+      value: keeper-clickhouse-keeper.pricing.svc.cluster.local:9181
+    - name: DB_EXPORT_METRICS
+      value: "true"
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: postgres-credentials-pricing
+    - name: DB_URI
+      value: postgresql://db-optimizer-sql-dev-master47e468c3-inventory-065c5.castai-db-optimizer.svc.cluster.local.:5432/inventory
+    - name: DB_USER
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: postgres-credentials-pricing
+    - name: ENTITY_CHANGED_EVENT_BATCH_SIZE
+      value: "1000"
+    - name: FEATURES_EVALUATION_METRICS
+      value: "true"
+    - name: FEATURES_GCS_BUCKET
+      value: dev-master-feature-flags
+    - name: FEATURES_GCS_CREDENTIALS
+      valueFrom:
+        secretKeyRef:
+          key: credentials.json
+          name: inventory-service-feature-flags
+    - name: FEATURES_USE_FLAGD_CLIENT
+      value: "true"
+    - name: IDLE_IN_TRANSACTION_SESSION_TIMEOUT
+      value: 2h
+    - name: INSTANCE_TYPES_CACHE_ENABLED
+      value: "false"
+    - name: IS_PRICE_THRESHOLD_CHECK_DISABLED
+      value: "true"
+    - name: ML_CLIENT_API_URL
+    - name: ML_CLIENT_MOCK
+      value: "true"
+    - name: PRICE_THRESHOLD_VALUE
+      value: "0.7"
+    - name: PUBSUB_GCP_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: PUBSUB_GCP_PROJECT_NUMBER
+      valueFrom:
+        configMapKeyRef:
+          key: project-number
+          name: inventory-pubsub-config
+    - name: SECRETS_MANAGER_GCP_PROJECT
+      valueFrom:
+        configMapKeyRef:
+          key: secret-manager-project-id
+          name: pricing-config
+    - name: SELF_URI
+      value: https://console.dev-master.cast.ai
+    - name: TEMPORAL_WORKER_SERVER_URI
+      value: temporal-frontend.temporal.svc.cluster.local:7233
+    - name: API_URL
+      value: https://api.dev-master.cast.ai
+    - name: CLICKHOUSE_CONFIG_CLUSTER_NAME
+      value: pricing
+    - name: SNAPSHOTSTORE_GCS_BUCKET
+      value: dev-master-console-cluster-snapshots-snapshotstore
+    envFrom:
+    - secretRef:
+        name: inventory-azure-credentials
+    - secretRef:
+        name: inventory-aws-credentials
+    - secretRef:
+        name: inventory-do-credentials
+    - secretRef:
+        name: cost-inventory-gcp-credentials
+    - secretRef:
+        name: auth0-env-vars
+    image: inventory:1260a1eb1f777b6c5b209745ae5a5977ec5766b0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      exec:
+        command:
+        - grpc_health_probe
+        - -addr=:$(SERVER_PORT)
+        - -rpc-timeout=3s
+      failureThreshold: 3
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 3
+    name: inventory
+    ports:
+    - containerPort: 8080
+      name: grpc
+      protocol: TCP
+    - containerPort: 8090
+      name: rest
+      protocol: TCP
+    - containerPort: 2112
+      name: metrics
+      protocol: TCP
+    readinessProbe:
+      exec:
+        command:
+        - grpc_health_probe
+        - -addr=:$(SERVER_PORT)
+        - -rpc-timeout=3s
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 3
+    resources:
+      limits:
+        memory: 1Gi
+      requests:
+        cpu: 102m
+        memory: 194Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+    startupProbe:
+      exec:
+        command:
+        - grpc_health_probe
+        - -addr=:$(SERVER_PORT)
+        - -rpc-timeout=3s
+      failureThreshold: 10
+      periodSeconds: 6
+      successThreshold: 1
+      timeoutSeconds: 3
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-d5s2l
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  imagePullSecrets:
+  - name: kubecast-registry
+  nodeName: gke-dev-master-cast-pool-71232d2e
+  nodeSelector:
+    scheduling.cast.ai/spot: "true"
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: gke.io/optimize-utilization-scheduler
+  securityContext:
+    fsGroup: 65532
+    runAsGroup: 65532
+    runAsNonRoot: true
+    runAsUser: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccount: inventory-common
+  serviceAccountName: inventory-common
+  terminationGracePeriodSeconds: 60
+  tolerations:
+  - key: scheduling.cast.ai/spot
+    operator: Exists
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-d5s2l
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-10T12:47:24Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-10T12:47:21Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-10T12:47:45Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-10T12:47:45Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-10T12:47:21Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://946bcb5375805f4a257d89f2ed6a510e7414f38046f44e7a7cdbcb6171effd02
+    image: inventory:1260a1eb1f777b6c5b209745ae5a5977ec5766b0
+    imageID: inventory@sha256:50a7b8f3bdc147fe87aca0e5fa5068ab1d6474ee3226e41f8fa8a4080be4a77a
+    lastState: {}
+    name: inventory
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2025-06-10T12:47:23Z"
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-d5s2l
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 10.10.0.41
+  hostIPs:
+  - ip: 10.10.0.41
+  phase: Running
+  podIP: 10.20.39.127
+  podIPs:
+  - ip: 10.20.39.127
+  qosClass: Burstable
+  startTime: "2025-06-10T12:47:21Z"

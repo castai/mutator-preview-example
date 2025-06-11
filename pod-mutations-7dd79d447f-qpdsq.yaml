@@ -1,0 +1,274 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    autoscaling.cast.ai/vertical-recommendation-hash: c34fbf85932c4b82
+    cni.projectcalico.org/containerID: 5b2c7e94026eb407d239df4674fea720a42e2d396ff2f79666ce09a683615689
+    cni.projectcalico.org/podIP: 10.20.1.2/32
+    cni.projectcalico.org/podIPs: 10.20.1.2/32
+    prometheus.io/path: /metrics
+    prometheus.io/port: "2112"
+    prometheus.io/scrape: "true"
+  creationTimestamp: "2025-06-05T07:54:09Z"
+  generateName: pod-mutations-7dd79d447f-
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: pod-mutations
+    helm.sh/chart: pod-mutations-666.420.69-20250603-1227-ebd07500e1e6ea4159d4e838
+    pod-template-hash: 7dd79d447f
+    team: pricing
+  name: pod-mutations-7dd79d447f-qpdsq
+  namespace: console
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: pod-mutations-7dd79d447f
+    uid: c592cc20-edbd-48f9-a3e2-5b03008099fa
+  resourceVersion: "2815902437"
+  uid: 24ca87e9-13bb-40de-94eb-cb2b588eb5cc
+spec:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - pod-mutations
+        topologyKey: kubernetes.io/hostname
+  containers:
+  - args:
+    - server
+    env:
+    - name: NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: INSTANCE_ID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: CONTAINER_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: ENVIRONMENT
+      value: dev-master
+    - name: SERVER_PORT
+      value: "8080"
+    - name: REST_PORT
+      value: "8090"
+    - name: METRICS_PORT
+      value: "2112"
+    - name: JAEGER_SERVICE_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels['app.kubernetes.io/name']
+    - name: JAEGER_ENDPOINT
+      value: http://tempo.tools.svc.cluster.local:14268/api/traces
+    - name: JAEGER_SAMPLER_TYPE
+      value: const
+    - name: JAEGER_SAMPLER_PARAM
+      value: "1"
+    - name: AUTOSCALER_SERVICE_URI
+      value: kubernetes:///autoscaler:grpc
+    - name: USERS_SERVICE_URI
+      value: kubernetes:///users:grpc
+    - name: EXTERNAL_PROVISIONER_SERVICE_URI
+      value: kubernetes:///external-provisioner:grpc
+    - name: SNAPSHOTS_SERVICE_URI
+      value: http://cluster-snapshots:8080
+    - name: FEATURES_CLIENT_RANDOM_CONN_CLOSER_ENABLED
+      value: "true"
+    - name: FEATURES_API_URL
+      value: http://features-relay.console.svc.cluster.local:1031
+    - name: DB_SKIPMIGRATIONS
+      value: "true"
+    - name: INSTALL_POD_MUTATOR_CHART_VERSION
+      value: 0.0.34
+    - name: AZURE_GOVCLOUD_ENABLED
+      value: "true"
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: postgres-credentials
+    - name: DB_URI
+      value: postgresql://postgres-headless-main.console.svc.cluster.local/pod-mutations
+    - name: DB_USER
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: postgres-credentials
+    - name: IDLE_IN_TRANSACTION_SESSION_TIMEOUT
+      value: 2h
+    - name: PUBSUB_GCP_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: SELF_URI
+      value: https://console.dev-master.cast.ai
+    - name: API_URL
+      value: https://api.dev-master.cast.ai
+    - name: SNAPSHOTSTORE_GCS_BUCKET
+      value: dev-master-console-cluster-snapshots-snapshotstore
+    image: pod-mutations:da9191d6fd21541a74b505b1e77feb713a14b756
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      exec:
+        command:
+        - grpc_health_probe
+        - -addr=:$(SERVER_PORT)
+        - -rpc-timeout=3s
+      failureThreshold: 3
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 3
+    name: pod-mutations
+    ports:
+    - containerPort: 8080
+      name: grpc
+      protocol: TCP
+    - containerPort: 8090
+      name: rest
+      protocol: TCP
+    - containerPort: 2112
+      name: metrics
+      protocol: TCP
+    readinessProbe:
+      exec:
+        command:
+        - grpc_health_probe
+        - -addr=:$(SERVER_PORT)
+        - -rpc-timeout=3s
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 3
+    resources:
+      limits:
+        memory: 1Gi
+      requests:
+        cpu: 10m
+        memory: 60Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: true
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-jhwlj
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  imagePullSecrets:
+  - name: kubecast-registry
+  nodeName: gke-dev-master-cast-pool-eeb65693
+  nodeSelector:
+    scheduling.cast.ai/spot: "true"
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: gke.io/optimize-utilization-scheduler
+  securityContext:
+    fsGroup: 65532
+    runAsGroup: 65532
+    runAsNonRoot: true
+    runAsUser: 65532
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccount: pod-mutations-sa
+  serviceAccountName: pod-mutations-sa
+  terminationGracePeriodSeconds: 60
+  tolerations:
+  - key: scheduling.cast.ai/spot
+    operator: Exists
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-jhwlj
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-05T07:54:12Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-05T07:54:09Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-05T07:54:24Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-05T07:54:24Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2025-06-05T07:54:09Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: containerd://4ed0fff1db4290f75417a14ffdd90031f03a396fc02e883ac04f08e3cae5bb57
+    image: pod-mutations:da9191d6fd21541a74b505b1e77feb713a14b756
+    imageID: pod-mutations@sha256:645524cd67c1183a784c8fs26d49894012e3f53c1dc08c021a0cd50eb241a909
+    lastState: {}
+    name: pod-mutations
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2025-06-05T07:54:11Z"
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-jhwlj
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 10.10.0.15
+  hostIPs:
+  - ip: 10.10.0.15
+  phase: Running
+  podIP: 10.20.1.2
+  podIPs:
+  - ip: 10.20.1.2
+  qosClass: Burstable
+  startTime: "2025-06-05T07:54:09Z"
