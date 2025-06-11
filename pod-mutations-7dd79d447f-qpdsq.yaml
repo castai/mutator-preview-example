@@ -2,13 +2,12 @@ apiVersion: v1
 kind: Pod
 metadata:
   annotations:
-    autoscaling.cast.ai/vertical-recommendation-hash: c34fbf85932c4b82
     cni.projectcalico.org/containerID: 5b2c7e94026eb407d239df4674fea720a42e2d396ff2f79666ce09a683615689
     cni.projectcalico.org/podIP: 10.20.1.2/32
     cni.projectcalico.org/podIPs: 10.20.1.2/32
     prometheus.io/path: /metrics
     prometheus.io/port: "2112"
-    prometheus.io/scrape: "true"
+    prometheus.io/scrape: "false"
   creationTimestamp: "2025-06-05T07:54:09Z"
   generateName: pod-mutations-7dd79d447f-
   labels:
@@ -17,6 +16,7 @@ metadata:
     helm.sh/chart: pod-mutations-666.420.69-20250603-1227-ebd07500e1e6ea4159d4e838
     pod-template-hash: 7dd79d447f
     team: pricing
+    department: engineering
   name: pod-mutations-7dd79d447f-qpdsq
   namespace: console
   ownerReferences:
